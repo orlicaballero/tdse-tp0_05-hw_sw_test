@@ -1,0 +1,69 @@
+Task A – Blocking Code
+Archivo fuente: task_a.c
+Tipo: Bloqueante
+
+Resumen:
+Tarea que incrementa un contador global (g_task_a_cnt) y ejecuta un bucle for hasta TASK_A_CNT_MAX, simulando carga de CPU. Alternativamente puede usar HAL_Delay() según la macro TEST_X.
+
+Variables:
+- g_task_a_cnt: contador global de ejecuciones
+- task_a_cnt: contador local temporal
+- p_task_a: puntero a string constante con descripción
+
+Funciones:
+- task_a_init(): inicializa la tarea y emite logs
+- task_a_update(): ejecuta el bucle for bloqueante o delay
+
+Diseño aplicado:
+- Patrón de ejecutor cíclico
+- Separación init/update
+- Simulación de tarea intensiva en CPU
+
+----------------------------------------------------
+Task B – Non-Blocking Code
+Archivo fuente: task_b.c
+Tipo: No bloqueante
+
+Resumen:
+Tarea que incrementa un contador global (g_task_b_cnt) y otro local estático (task_b_cnt). Alternativamente mide el tiempo transcurrido con HAL_GetTick() sin bloquear el flujo del sistema.
+
+Variables:
+- g_task_b_cnt: contador global de ejecuciones
+- task_b_cnt: contador local estático
+- p_task_b: descripción de la tarea
+
+Funciones:
+- task_b_init(): reinicia contadores y loguea
+- task_b_update(): actualiza contadores sin frenar el sistema
+
+Diseño aplicado:
+- Patrón no bloqueante
+- Uso de variables estáticas
+- Alternativa basada en tiempo con HAL_GetTick()
+
+----------------------------------------------------
+Task C – Update by Time Code
+Archivo fuente: task_c.c
+Tipo: Basada en tiempo (temporizada)
+
+Resumen:
+Tarea que ejecuta código solo si g_task_c_tick_cnt es mayor a 0. Usa bandera local y secciones críticas para proteger acceso a recursos compartidos entre interrupciones.
+
+Variables:
+- g_task_c_cnt: contador global de ejecuciones
+- g_task_c_tick_cnt: contador compartido (volatile)
+- b_time_update_required: bandera para decidir ejecución
+- p_task_c: string descriptiva
+
+Funciones:
+- task_c_init(): inicializa contadores y loguea
+- task_c_update(): decrece ticks y ejecuta tareas temporizadas
+
+Diseño aplicado:
+- Patrón de ejecución por tiempo (software timer)
+- Protección de recursos compartidos con CPSID i / CPSIE i
+- Modularidad init/update
+
+----------------------------------------------------
+Nota final:
+Todas las tareas siguen el patrón de ejecutor cíclico de tareas, permitiendo un sistema modular, predecible y escalable. La separación entre inicialización y actualización mejora la mantenibilidad del sistema y favorece la reutilización del código.

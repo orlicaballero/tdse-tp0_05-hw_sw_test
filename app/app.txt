@@ -1,0 +1,7 @@
+El archivo app.c contiene:
+- La definición de dos estructuras: una para la configuración de tareas (`task_cfg_t`) y otra para el estado de las tareas (`task_dta_t`).
+- Dos arrays: `tasks_cfg[]` y `tasks_dta[]`, uno por cada tipo de estructura, para manejar múltiples tareas.
+- La función app_init(), que inicializa todas las tareas, llamando a task_xxxx_init() por cada una.
+- La función app_update(), que ejecuta el ciclo principal, llamando a la función de cada tarea.
+
+Esto permite implementar un ejecutor cíclico de tareas, un patrón común en sistemas embebidos sin RTOS.

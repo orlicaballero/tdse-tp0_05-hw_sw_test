@@ -1,0 +1,10 @@
+El archivo main.c contiene la función principal main(), que se ejecuta al prender el microcontrolador. 
+
+main() realiza las siguientes funciones:
+- Llama a HAL_Init() que reinicia todos los periféricos.
+- Configura el reloj del sistema (SystemClock_Config()).
+- Inicializa periféricos (GPIO y UART).
+- Llama a app_init() que inicializa el ejecutor cíclico de tareas.
+- Entra en un bucle infinito y ejecuta app_update() continuamente.
+
+Este patrón representa un ejecutor cíclico típico en sistemas embebidos.

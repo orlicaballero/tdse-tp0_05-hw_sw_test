@@ -1,0 +1,69 @@
+El archivo `startup_stm32f103rbtx.s` es un módulo en lenguaje ensamblador que define el punto de entrada del programa embebido y establece la tabla de vectores de interrupción para el microcontrolador STM32F103xB.
+
+---
+
+### 1. Propósito del archivo
+
+Este archivo realiza funciones críticas al inicio del sistema:
+- Establece la dirección del stack inicial.
+- Define el `Reset_Handler`, que arranca la ejecución del programa.
+- Copia las secciones `.data` y `.bss` desde la memoria Flash a RAM.
+- Llama a la función `main()` para comenzar la ejecución en C.
+- Define la tabla de vectores de interrupciones, ubicada en 0x00000000.
+- Proporciona alias débiles para cada manejador de interrupciones.
+
+---
+
+### 2. `Reset_Handler`
+
+Esta función especial es el punto de arranque del programa y realiza:
+
+- Llamado a `SystemInit()` para inicializar el sistema de reloj.
+- Copia de datos desde la sección `.data` (en Flash) a RAM.
+- Inicialización a cero de la sección `.bss`.
+- Llamado a `__libc_init_array()` para ejecutar constructores estáticos en C/C++.
+- Llamado final a `main()` para comenzar el programa principal.
+
+---
+
+### 3. Tabla de vectores
+
+El símbolo `g_pfnVectors` contiene un arreglo de punteros a funciones (ISRs), ordenados según las excepciones del Cortex-M3 y los periféricos STM32. Los primeros elementos son:
+
+- `_estack`: puntero al final del stack.
+- `Reset_Handler`: función que arranca el programa.
+- `NMI_Handler`, `HardFault_Handler`, etc.
+
+Y más abajo:
+- Manejadores para EXTI, USART, SPI, TIM, ADC, etc.
+
+---
+
+### 4. Default_Handler
+
+Es una función por defecto que entra en un bucle infinito. Se usa si no se define un ISR específico. Esto ayuda a la depuración cuando ocurre una interrupción no controlada.
+
+---
+
+### 5. Aliases débiles
+
+Cada función ISR (como `USART1_IRQHandler`, `TIM2_IRQHandler`, etc.) se define como `weak`, apuntando a `Default_Handler`. Esto significa que si el usuario define su propia versión, esa tendrá prioridad. Si no, se usa la por defecto.
+
+---
+
+### 6. Estructura típica de los datos
+
+El archivo hace uso de símbolos definidos en el linker script:
+- `_sidata`: inicio de `.data` en Flash.
+- `_sdata`, `_edata`: límites de `.data` en RAM.
+- `_sbss`, `_ebss`: límites de `.bss` en RAM.
+- `_estack`: stack pointer inicial.
+
+Estas direcciones permiten que los datos globales funcionen correctamente al iniciar el programa.
+
+---
+
+### 7. Conclusión
+
+Este archivo es esencial para el funcionamiento del sistema embebido. Sin él, el microcontrolador no podría arrancar correctamente ni redirigir las interrupciones. También establece la base para ejecutar programas en C y proporciona un mecanismo seguro para manejar eventos inesperados mediante el `Default_Handler`.
+
